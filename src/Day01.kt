@@ -1,18 +1,43 @@
+import kotlin.math.abs
+
+val WHITESPACE_REGEX = Regex("\\s+")
+
 fun main() {
     fun part1(input: List<String>): Int {
-        return input.size
+        val (leftList, rightList) = input
+            .map { distinctLine ->
+                val (left, right) = distinctLine.split(WHITESPACE_REGEX).map { it.toInt() }
+                Pair(left, right)
+            }.unzip()
+
+        val sortedLeft = leftList.sorted()
+        val sortedRight = rightList.sorted()
+
+        return sortedLeft.zip(sortedRight) { left, right ->
+            abs(left - right)
+        }.sum()
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        var score = 0
+        val (leftList, rightList) = input
+            .map { distinctLine ->
+                val (left, right) = distinctLine.split(WHITESPACE_REGEX).map { it.toInt() }
+                Pair(left, right)
+            }.unzip()
+        val checkMap = mutableMapOf<Int, Int>()
+        rightList.forEach {
+            checkMap.put(it, (checkMap.getOrDefault(it, 0) + 1))
+        }
+
+        leftList.forEach {
+            val count = checkMap.get(it) ?: return@forEach
+            val addScore = count * it
+            score += addScore
+        }
+
+        return score
     }
-
-    // Test if implementation meets criteria from the description, like:
-    check(part1(listOf("test_input")) == 1)
-
-    // Or read a large test input from the `src/Day01_test.txt` file:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
 
     // Read the input from the `src/Day01.txt` file.
     val input = readInput("Day01")
